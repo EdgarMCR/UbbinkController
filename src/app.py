@@ -67,7 +67,7 @@ def get_status():
     if is_boosting:
         if boost_end_timestamp is not None:
             remaining_seconds = max(0, int(boost_end_timestamp - time.time()))
-            status["remaining_seconds"] = remaining_seconds # str(datetime.timedelta(seconds=remaining_seconds))
+            status["remaining_seconds"] = str(datetime.timedelta(seconds=remaining_seconds))
 
     logger.info(f"Returning status: {status}")
     return status
