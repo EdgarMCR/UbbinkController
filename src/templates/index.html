@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventilation Control</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background: #f4f4f5; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        button { padding: 0.75rem; border: none; border-radius: 6px; background: #3b82f6; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2563eb; }
+        .revert-btn { background: #ef4444; width: 100%; margin-top: 1rem; }
+        .revert-btn:hover { background: #dc2626; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Live Status</h2>
+        <p> Current Setting: <strong id="current_setting">--</strong></p>
+        <p>Extract Airflow: <strong id="extract_airflow">--</strong> m³/h</p>
+        <p>Supply Airflow: <strong id="supply_airflow">--</strong> m³/h</p>
+        <p>Extract Temp: <strong id="extract_temp">--</strong> °C</p>
+        <p>Supply Temp: <strong id="supply_temp">--</strong> °C</p>
+        <p>Control Source: <strong id="control_source">--</strong></p>
+    </div>
+
+    <div class="card">
+        <h2>Permanent Mode</h2>
+        <div class="grid">
+            <button onclick="setMode(0)">Holiday (0)</button>
+            <button onclick="setMode(1)">Low (1)</button>
+            <button onclick="setMode(2)">Normal (2)</button>
+            <button onclick="setMode(3)">High (3)</button>
+        </div>
+        <button class="revert-btn" onclick="revertControl()">Release to Wall Switch</button>
+    </div>
+
+    <div class="card">
+        <h2>Temporary Boost</h2>
+        <div class="grid">
+            <button onclick="triggerBoost(2, 30)" style="background: #10b981;">Normal (2) - 30 Mins</button>
+            <button onclick="triggerBoost(2, 60)" style="background: #10b981;">Normal (2) - 60 Mins</button>
+
+            <button onclick="triggerBoost(3, 30)">High (3) - 30 Mins</button>
+            <button onclick="triggerBoost(3, 60)">High (3) - 60 Mins</button>
+        </div>
+
+        <button class="revert-btn" onclick="revertControl()" style="background: #f59e0b; margin-top: 1rem;">
+            Cancel Active Boost / Stop Timer
+        </button>
+    </div>
+
+    <script>
+        async function fetchStatus() {
+            const res = await fetch('/api/status');
+            const data = await res.json();
+            document.getElementById('current_setting').innerHTML = data.current_setting !== null ? data.current_setting : 'Err';
+            document.getElementById('extract_airflow').innerText = data.extract_airflow_m3h !== null ? data.extract_airflow_m3h : 'Err';
+            document.getElementById('supply_airflow').innerText = data.supply_airflow_m3h !== null ? data.supply_airflow_m3h : 'Err';
+            document.getElementById('supply_temp').innerText = data.supply_temp !== null ? data.supply_temp : 'Err';
+            document.getElementById('extract_temp').innerText = data.extract_temp !== null ? data.extract_temp : 'Err';
+            document.getElementById('control_source').innerText = data.control_mode === 1 ? "Modbus Overridden" : "Wall Switch";
+        }
+
+        async function setMode(mode) {
+            await fetch('/api/mode', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mode: mode})
+            });
+            setTimeout(fetchStatus, 1000);
+        }
+
+        async function triggerBoost(mode, minutes) {
+            const res = await fetch('/api/boost', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mode: mode, duration_minutes: minutes})
+            });
+
+            if (res.ok) {
+                // Change button color or alert to show it worked
+                alert(`Timer started: Level ${mode} for ${minutes} minutes.`);
+            }
+            setTimeout(fetchStatus, 1000);
+        }
+
+        async function revertControl() {
+            await fetch('/api/revert', { method: 'POST' });
+            setTimeout(fetchStatus, 1000);
+        }
+
+        // Refresh status every 5 seconds
+        setInterval(fetchStatus, 10000);
+        fetchStatus();
+    </script>
+</body>
+</html>

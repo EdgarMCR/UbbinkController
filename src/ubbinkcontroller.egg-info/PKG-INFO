@@ -1,4 +1,0 @@
-Metadata-Version: 2.4
-Name: ubbinkcontroller
-Version: 0.0.1
-Requires-Dist: minimalmodbus>=2.1.1
