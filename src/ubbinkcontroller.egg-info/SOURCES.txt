@@ -1,0 +1,7 @@
+pyproject.toml
+src/main.py
+src/ubbinkcontroller.egg-info/PKG-INFO
+src/ubbinkcontroller.egg-info/SOURCES.txt
+src/ubbinkcontroller.egg-info/dependency_links.txt
+src/ubbinkcontroller.egg-info/requires.txt
+src/ubbinkcontroller.egg-info/top_level.txt
