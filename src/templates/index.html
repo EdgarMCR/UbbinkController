@@ -24,6 +24,10 @@
         <p>Extract Temp: <strong id="extract_temp">--</strong> °C</p>
         <p>Supply Temp: <strong id="supply_temp">--</strong> °C</p>
         <p>Control Source: <strong id="control_source">--</strong></p>
+        <div id="boost_badge" style="display: none; background: #dcfce7; color: #166534; padding: 10px; border-radius: 5px; border: 1px solid #bbf7d0; margin-top: 10px; text-align: center; font-weight: bold;">
+        ⚡ Boost Timer Active-
+            <p>Remaining Time: <strong id="remaining_seconds">--</strong></p>
+        </div>
     </div>
 
     <div class="card">
@@ -62,6 +66,15 @@
             document.getElementById('supply_temp').innerText = data.supply_temp !== null ? data.supply_temp : 'Err';
             document.getElementById('extract_temp').innerText = data.extract_temp !== null ? data.extract_temp : 'Err';
             document.getElementById('control_source').innerText = data.control_mode === 1 ? "Modbus Overridden" : "Wall Switch";
+
+            // Toggle the Boost Badge
+            const badge = document.getElementById('boost_badge');
+            if (data.is_boosting) {
+                badge.style.display = 'block';
+                document.getElementById('remaining_seconds').innerText = data.remaining_seconds !== null ? data.remaining_seconds : "Err";
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         async function setMode(mode) {
