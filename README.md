@@ -6,6 +6,7 @@ Tested on a Ubbink Ubiflux Vigro 225.
 Uses Python 3.13.
 
 Tested on Ubuntu and Raspberry Pi OS.
+![Ubbink_with_RaPi.jpg](docs/Ubbink_with_RaPi.jpg)
 
 ## UI
 ![img.png](docs/ui.png)
