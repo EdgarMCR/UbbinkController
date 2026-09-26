@@ -21,6 +21,8 @@ templates = Jinja2Templates(directory=os.path.join(current_dir, "templates"))
 # Global variable to track active boost timers
 active_boost_task = None
 boost_end_timestamp = None
+pre_boost_level = None
+
 
 class ModeRequest(BaseModel):
     mode: int
@@ -31,16 +33,16 @@ class BoostRequest(BaseModel):
     duration_minutes: int
 
 
-async def boost_timer_task(mode: int, duration_minutes: int):
-    """Background task to hold a mode, then revert to wall unit."""
-    logger.info(f"Starting boost: Mode {mode} for {duration_minutes} minutes.")
+async def boost_timer_task(mode: int, duration_minutes: int, revert_mode: int):
+    """Background task to hold a mode, then revert to revert_mode."""
+    logger.info(f"Starting boost: Mode {mode} for {duration_minutes} minutes, then {revert_mode}")
     vigor_service.set_airflow_mode(AirflowMode(mode))
 
     try:
         # Sleep for the requested duration
         await asyncio.sleep(duration_minutes * 60)
-        logger.info("Boost complete. Reverting to wall unit.")
-        vigor_service.revert_to_wall_unit()
+        logger.info(f"Boost complete. Reverting to {revert_mode}")
+        vigor_service.set_airflow_mode(AirflowMode(revert_mode))
     except asyncio.CancelledError:
         logger.info("Previous boost timer was cancelled.")
 
@@ -105,9 +107,12 @@ async def trigger_boost(req: BoostRequest):
     if active_boost_task:
         active_boost_task.cancel()
 
+    status = vigor_service.get_status()
+    current_mode = status["current_airflow_mode"]
+
     # Start the new background timer
     active_boost_task = asyncio.create_task(
-        boost_timer_task(req.mode, req.duration_minutes)
+        boost_timer_task(req.mode, req.duration_minutes, current_mode)
     )
     boost_end_timestamp = time.time() + (req.duration_minutes * 60)
     return {"status": "boost_started", "duration": req.duration_minutes}

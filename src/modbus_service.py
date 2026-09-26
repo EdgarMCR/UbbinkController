@@ -127,6 +127,7 @@ class VigorModbusService:
             "extract_airflow_m3h": self.read_register_safe(Registries.EXTRACT_AIRFLOW_ACTUAL.value),
             "supply_temp": self.read_register_safe(Registries.SUPPLY_TEMPERATURE.value),
             "extract_temp": self.read_register_safe(Registries.EXTRACT_TEMPERATURE.value),
+            "current_airflow_mode": current_airflow_mode,
         }
 
     def set_airflow_mode(self, mode: AirflowMode) -> bool:
