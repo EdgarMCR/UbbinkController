@@ -31,17 +31,6 @@
     </div>
 
     <div class="card">
-        <h2>Permanent Mode</h2>
-        <div class="grid">
-            <button onclick="setMode(0)">Holiday (0)</button>
-            <button onclick="setMode(1)">Low (1)</button>
-            <button onclick="setMode(2)">Normal (2)</button>
-            <button onclick="setMode(3)">High (3)</button>
-        </div>
-        <button class="revert-btn" onclick="revertControl()">Release to Wall Switch</button>
-    </div>
-
-    <div class="card">
         <h2>Temporary Boost</h2>
         <div class="grid">
             <button onclick="triggerBoost(2, 30)" style="background: #10b981;">Normal (2) - 30 Mins</button>
@@ -54,6 +43,17 @@
         <button class="revert-btn" onclick="revertControl()" style="background: #f59e0b; margin-top: 1rem;">
             Cancel Active Boost / Stop Timer
         </button>
+    </div>
+
+    <div class="card">
+        <h2>Permanent Mode</h2>
+        <div class="grid">
+            <button onclick="setMode(0)">Holiday (0)</button>
+            <button onclick="setMode(1)">Low (1)</button>
+            <button onclick="setMode(2)">Normal (2)</button>
+            <button onclick="setMode(3)">High (3)</button>
+        </div>
+        <button class="revert-btn" onclick="revertControl()">Release to Wall Switch</button>
     </div>
 
     <script>
